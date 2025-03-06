@@ -1,0 +1,66 @@
+services:
+  # POSTGRES DATABASE FOR USERS
+  db-user:
+    container_name: db-users
+    image: postgres:15.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password_here
+    ports:
+      - 5431:5431
+    expose:
+      - 5431
+    command: -p 5431
+
+  # POSTGRES DATABASE FOR TRANSACTIONS
+  db-transactions:
+    container_name: db-transactions
+    image: postgres:15.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: transactions
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password_here
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    command: -p 5432
+
+  # MONGODB DATABASE FOR NOTIFICATIONS
+  mongo-notifications:
+    container_name: db-notifications
+    image: mongo:6.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: notifications
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: your_mongo_password_here
+    ports:
+      - 27018:27017
+    expose:
+      - 27017
+    volumes:
+      - db-notifications-data:/data/db
+
+  # MONGODB DATABASE FOR LOGS
+  mongo-logs:
+    container_name: db-logs
+    image: mongo:6.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: your_mongo_password_here
+    ports:
+      - 27019:27017
+    expose:
+      - 27017
+    volumes:
+      - db-logs-data:/data/db
+
+volumes:
+  db-notifications-data:
+  db-logs-data:

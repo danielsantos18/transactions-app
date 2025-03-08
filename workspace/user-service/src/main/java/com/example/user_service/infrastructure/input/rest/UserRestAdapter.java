@@ -6,8 +6,6 @@ import com.example.user_service.infrastructure.input.rest.model.request.UserRequ
 import com.example.user_service.infrastructure.input.rest.model.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +28,6 @@ public class UserRestAdapter {
         return userRestMapper.toUserResponse(userServicePort.findById(id));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<UserResponse> save(@Valid @RequestBody UserRequest Request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userRestMapper.toUserResponse(userServicePort
-                        .save(userRestMapper.toUser(Request))));
-    }
 
     @PutMapping("/update/{id}")
     public UserResponse update(@PathVariable Long id, @Valid @RequestBody UserRequest Request) {

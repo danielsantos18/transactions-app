@@ -2,8 +2,6 @@ package com.example.notification_service.infrastructure.output.persistence.entit
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "notifications") // Define la colección en MongoDB
 public class NotificationEntity {
 
     private String id;

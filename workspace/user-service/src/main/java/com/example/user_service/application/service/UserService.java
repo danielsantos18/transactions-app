@@ -9,10 +9,16 @@ import com.example.user_service.domain.model.User;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -20,6 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService implements UserServicePort {
 
+    private static final String NOTIFICATION_SERVICE_URL = "http://localhost:8082/notification/sent";
+    private final RestTemplate restTemplate;
     private final UserPersistencePort userPersistencePort;
     private final PasswordEncoder passwordEncoder;
 
@@ -33,11 +41,35 @@ public class UserService implements UserServicePort {
             throw new ValidationException("El teléfono ya está registrado");
         }
 
-        // Asignar el rol USER si no se especifica
         if (user.getRole() == null) {
             user.setRole(Role.USER);
         }
 
+        // Enviar mensaje de bienvenida
+        String message = "¡Bienvenido, " + user.getUsername() + "! Gracias por registrarte.";
+
+        // Crear un objeto para el cuerpo de la solicitud
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("phoneNumber", user.getPhone());
+        requestBody.put("message", message);
+
+        // Configurar los headers para indicar que el contenido es JSON
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Crear la entidad HTTP con el cuerpo y los headers
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
+
+        // Llamar al microservicio de notificaciones
+        try {
+            String notificationResponse = restTemplate.postForObject(
+                    NOTIFICATION_SERVICE_URL,
+                    httpEntity,
+                    String.class);
+            System.out.println("Respuesta del servicio de notificaciones: " + notificationResponse);
+        } catch (Exception e) {
+            System.err.println("Error al enviar el mensaje de bienvenida: " + e.getMessage());
+        }
         // Encripta la contraseña
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

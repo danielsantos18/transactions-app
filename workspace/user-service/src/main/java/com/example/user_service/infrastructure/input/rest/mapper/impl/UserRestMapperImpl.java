@@ -4,7 +4,6 @@ import com.example.user_service.domain.model.User;
 import com.example.user_service.infrastructure.input.rest.mapper.UserRestMapper;
 import com.example.user_service.infrastructure.input.rest.model.request.UserRequest;
 import com.example.user_service.infrastructure.input.rest.model.response.UserResponse;
-import com.example.user_service.infrastructure.util.ApiResponse;
 
 import org.springframework.stereotype.Component;
 
@@ -48,13 +47,6 @@ public class UserRestMapperImpl implements UserRestMapper {
         userResponse.role(user.getRole());
 
         return userResponse.build();
-    }
-
-    public UserResponse toUserResponse(ApiResponse<User> apiResponse) {
-        if (apiResponse == null || apiResponse.getData() == null) {
-            return null;
-        }
-        return toUserResponse(apiResponse.getData());
     }
 
     @Override

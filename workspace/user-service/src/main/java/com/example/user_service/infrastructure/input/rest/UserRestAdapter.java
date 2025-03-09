@@ -28,7 +28,6 @@ public class UserRestAdapter {
         return userRestMapper.toUserResponse(userServicePort.findById(id));
     }
 
-
     @PutMapping("/update/{id}")
     public UserResponse update(@PathVariable Long id, @Valid @RequestBody UserRequest Request) {
         return userRestMapper.toUserResponse(userServicePort

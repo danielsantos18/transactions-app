@@ -7,10 +7,8 @@ import com.example.user_service.infrastructure.input.rest.model.request.UserRequ
 import com.example.user_service.infrastructure.input.rest.model.response.AuthResponse;
 import com.example.user_service.infrastructure.input.rest.model.response.UserResponse;
 import com.example.user_service.infrastructure.util.JwtUtil;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,15 +35,15 @@ public class AuthRestAdapter {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         String token = jwtUtil.generateToken(userDetails.getUsername());
-
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> save(@Valid @RequestBody UserRequest Request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userRestMapper.toUserResponse(userServicePort
-                        .save(userRestMapper.toUser(Request))));
-    }
+    public ResponseEntity<UserResponse> save(@Valid @RequestBody UserRequest request) {
+        // Guardar el usuario
+        UserResponse userResponse = userRestMapper.toUserResponse(
+                userServicePort.save(userRestMapper.toUser(request)));
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+    }
 }

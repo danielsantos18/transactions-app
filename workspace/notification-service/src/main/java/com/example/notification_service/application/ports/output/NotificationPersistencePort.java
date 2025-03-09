@@ -11,10 +11,11 @@ public interface NotificationPersistencePort {
 
     List<Notification> findUnsentNotifications();
 
-   // void markAsSent(Notification notification);
+    // void markAsSent(Notification notification);
 
     boolean sendMessage(String phoneNumber, String Message);
 
     Optional<Notification> findById(String id);
 
+    List<Notification> getAllNotifications();
 }

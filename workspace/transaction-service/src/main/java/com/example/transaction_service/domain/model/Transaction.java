@@ -6,37 +6,40 @@ import java.util.UUID;
 
 public class Transaction {
     private UUID id;
-    private UUID senderId;
-    private UUID receiverId;
+    private String senderUsername; // Cambiamos a String para el nombre de usuario
+    private String receiverUsername; // Cambiamos a String para el nombre de usuario
     private BigDecimal amount;
     private LocalDateTime timestamp;
     private String status;
 
-    // 🔹 Constructor sin parámetros necesario para la serialización/deserialización
+    // Constructor sin parámetros
     public Transaction() {
     }
 
-    public Transaction(UUID id, UUID senderId, UUID receiverId, BigDecimal amount, LocalDateTime timestamp, String status) {
+    // Constructor con parámetros
+    public Transaction(UUID id, String senderUsername, String receiverUsername, BigDecimal amount, LocalDateTime timestamp, String status) {
         this.id = id;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+        this.senderUsername = senderUsername;
+        this.receiverUsername = receiverUsername;
         this.amount = amount;
         this.timestamp = timestamp;
         this.status = status;
     }
 
-    public Transaction(UUID senderId, UUID receiverId, BigDecimal amount) {
-        this(UUID.randomUUID(), senderId, receiverId, amount, LocalDateTime.now(), "PENDING");
+    // Constructor simplificado
+    public Transaction(String senderUsername, String receiverUsername, BigDecimal amount) {
+        this(UUID.randomUUID(), senderUsername, receiverUsername, amount, LocalDateTime.now(), "PENDING");
     }
 
+    // Getters y setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public UUID getSenderId() { return senderId; }
-    public void setSenderId(UUID senderId) { this.senderId = senderId; }
+    public String getSenderUsername() { return senderUsername; }
+    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
 
-    public UUID getReceiverId() { return receiverId; }
-    public void setReceiverId(UUID receiverId) { this.receiverId = receiverId; }
+    public String getReceiverUsername() { return receiverUsername; }
+    public void setReceiverUsername(String receiverUsername) { this.receiverUsername = receiverUsername; }
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }

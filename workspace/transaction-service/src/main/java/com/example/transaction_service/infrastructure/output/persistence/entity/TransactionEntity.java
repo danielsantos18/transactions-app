@@ -6,45 +6,36 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transactions")
 public class TransactionEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO) // Cambiado a GenerationType.AUTO
     private UUID id;
-    private UUID senderId;
-    private UUID receiverId;
+
+    private String senderUsername;
+    private String receiverUsername;
     private BigDecimal amount;
     private LocalDateTime timestamp;
     private String status;
 
-    public TransactionEntity() {}
-
-    public TransactionEntity(UUID id, UUID senderId, UUID receiverId, BigDecimal amount, LocalDateTime timestamp, String status) {
-        this.id = id;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.amount = amount;
-        this.timestamp = timestamp;
-        this.status = status;
-    }
-
-    // Getters
+    // Getters y setters
     public UUID getId() { return id; }
-    public UUID getSenderId() { return senderId; }
-    public UUID getReceiverId() { return receiverId; }
-    public BigDecimal getAmount() { return amount; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public String getStatus() { return status; }
-
-    // **Setters agregados**
     public void setId(UUID id) { this.id = id; }
-    public void setSenderId(UUID senderId) { this.senderId = senderId; }
-    public void setReceiverId(UUID receiverId) { this.receiverId = receiverId; }
+
+    public String getSenderUsername() { return senderUsername; }
+    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
+
+    public String getReceiverUsername() { return receiverUsername; }
+    public void setReceiverUsername(String receiverUsername) { this.receiverUsername = receiverUsername; }
+
+    public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 }
-
 
 
 

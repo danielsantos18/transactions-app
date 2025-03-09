@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface TransactionPersistencePort {
     Transaction saveTransaction(Transaction transaction);
-    Transaction getTransactionById(UUID transactionId);
-    List<Transaction> getTransactionsByUserId(UUID userId);
+    Transaction getTransactionById(UUID id);
+    List<Transaction> getAllTransactions();
+    List<Transaction> getTransactionsByUsername(String username); // Cambiado a String
 }
-

@@ -6,6 +6,7 @@ import com.example.transaction_service.infrastructure.output.persistence.entity.
 import com.example.transaction_service.infrastructure.output.persistence.mapper.TransactionPersistenceMapper;
 import com.example.transaction_service.infrastructure.output.persistence.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,19 +29,25 @@ public class TransactionPersistenceAdapter implements TransactionPersistencePort
     }
 
     @Override
-    public Transaction getTransactionById(UUID transactionId) {
-        return transactionRepository.findById(transactionId)
+    public Transaction getTransactionById(UUID id) {
+        return transactionRepository.findById(id)
                 .map(transactionMapper::toDomain)
                 .orElse(null);
     }
 
     @Override
-    public List<Transaction> getTransactionsByUserId(UUID userId) {
-        return transactionRepository.findBySenderIdOrReceiverId(userId, userId)
+    public List<Transaction> getTransactionsByUsername(String username) {
+        return transactionRepository.findBySenderUsernameOrReceiverUsername(username, username)
                 .stream()
                 .map(transactionMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+public List<Transaction> getAllTransactions() {
+    return transactionRepository.findAll()
+            .stream()
+            .map(transactionMapper::toDomain)
+            .collect(Collectors.toList());
 }
-
-
+}

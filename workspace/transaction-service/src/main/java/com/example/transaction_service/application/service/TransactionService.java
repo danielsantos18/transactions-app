@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List; // Importación agregada
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,38 +24,38 @@ public class TransactionService implements TransactionServicePort {
     }
 
     @Transactional
-    public String transferMoney(UUID senderId, UUID receiverId, BigDecimal amount) {
-        if (!userClient.userExists(senderId) || !userClient.userExists(receiverId)) {
+    public String transferMoney(String senderUsername, String receiverUsername, BigDecimal amount) {
+        if (!userClient.userExists(senderUsername) || !userClient.userExists(receiverUsername)) {
             return "Uno o ambos usuarios no existen.";
         }
 
-        BigDecimal senderBalance = userClient.getUserBalance(senderId);
+        BigDecimal senderBalance = userClient.getUserBalance(senderUsername);
         if (senderBalance.compareTo(amount) < 0) {
             return "Saldo insuficiente.";
         }
 
         BigDecimal newSenderBalance = senderBalance.subtract(amount);
-        BigDecimal receiverBalance = userClient.getUserBalance(receiverId).add(amount);
+        BigDecimal receiverBalance = userClient.getUserBalance(receiverUsername).add(amount);
 
-        userClient.updateUserBalance(senderId, newSenderBalance);
-        userClient.updateUserBalance(receiverId, receiverBalance);
+        userClient.updateUserBalance(senderUsername, newSenderBalance);
+        userClient.updateUserBalance(receiverUsername, receiverBalance);
 
-        // ✅ Se usa el constructor correcto con tres parámetros
-        Transaction transaction = new Transaction(senderId, receiverId, amount);
+        Transaction transaction = new Transaction(senderUsername, receiverUsername, amount);
         transactionPersistencePort.saveTransaction(transaction);
 
         return "Transferencia realizada con éxito.";
     }
 
-    // ✅ Se agregan los métodos para TransactionController
-    public Transaction createTransaction(UUID senderId, UUID receiverId, BigDecimal amount) {
-        Transaction transaction = new Transaction(senderId, receiverId, amount);
+    public Transaction createTransaction(String senderUsername, String receiverUsername, BigDecimal amount) {
+        Transaction transaction = new Transaction(senderUsername, receiverUsername, amount);
         return transactionPersistencePort.saveTransaction(transaction);
     }
 
     public Optional<Transaction> getTransactionById(UUID id) {
-        // ✅ Se envuelve en Optional para evitar errores de conversión
         return Optional.ofNullable(transactionPersistencePort.getTransactionById(id));
     }
-}
 
+    public List<Transaction> getAllTransactions() {
+        return transactionPersistencePort.getAllTransactions();
+    }
+}

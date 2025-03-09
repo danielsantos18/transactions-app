@@ -6,7 +6,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, UUID> {
-    List<TransactionEntity> findBySenderIdOrReceiverId(UUID senderId, UUID receiverId);
+    List<TransactionEntity> findBySenderUsernameOrReceiverUsername(String senderUsername, String receiverUsername);
 }
-
-

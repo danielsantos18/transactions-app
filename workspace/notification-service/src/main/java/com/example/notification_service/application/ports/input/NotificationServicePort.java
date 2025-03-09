@@ -9,7 +9,7 @@ public interface NotificationServicePort {
 
     List<Notification> findUnsentNotifications();
 
-    void markAsSent(Notification notification);
+    //void markAsSent(Notification notification);
 
     boolean sendMessage(Notification notification);
 }

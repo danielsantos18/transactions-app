@@ -29,21 +29,18 @@ services:
     expose:
       - 5432
 
-  # MONGODB DATABASE FOR NOTIFICATIONS
-  mongo-notifications:
-    container_name: db-notifications
-    image: mongo:6.0
+   # REDIS DATABASE FOR NOTIFICATIONS
+  redis-notifications:
+    container_name: redis-notifications
+    image: redis:7.0
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: notifications
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root 
     ports:
-      - 27018:27017
+      - "6379:6379"
     expose:
-      - 27017
+      - 6379
     volumes:
-      - db-notifications-data:/data/db
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
 
   # MONGODB DATABASE FOR LOGS
   mongo-logs:
@@ -78,3 +75,4 @@ services:
 volumes:
   db-notifications-data:
   db-logs-data:
+  redis-data:

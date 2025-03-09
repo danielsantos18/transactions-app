@@ -25,12 +25,10 @@ public class UserService implements UserServicePort {
 
     @Override
     public User save(User user) {
-        // Validar si el correo ya está registrado
         if (userPersistencePort.findByEmail(user.getEmail()).isPresent()) {
             throw new ValidationException("El correo ya está registrado");
         }
 
-        // Validar si el teléfono ya está registrado
         if (userPersistencePort.findByPhone(user.getPhone()).isPresent()) {
             throw new ValidationException("El teléfono ya está registrado");
         }

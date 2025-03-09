@@ -25,13 +25,13 @@ public class NotificationRestAdapter {
     private final NotificationRestMapper mapper;
 
     @PostMapping("/sent")
-    public ResponseEntity<Notification> createNotification(@RequestBody NotificationRequest request) {
+    public ResponseEntity<Notification> sendNotification(@RequestBody NotificationRequest request) {
         Notification notification = mapper.toNotification(request);
-        return ResponseEntity.ok(notificationService.saveNotification(notification));
+        return ResponseEntity.ok(notificationService.save(notification));
     }
 
     @GetMapping("/pending")
     public ResponseEntity<List<Notification>> getPendingNotifications() {
-        return ResponseEntity.ok(notificationService.getPendingNotifications());
+        return ResponseEntity.ok(notificationService.findUnsentNotifications());
     }
 }

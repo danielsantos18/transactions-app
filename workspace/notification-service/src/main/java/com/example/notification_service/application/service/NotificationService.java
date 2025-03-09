@@ -1,38 +1,67 @@
 package com.example.notification_service.application.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.notification_service.application.ports.input.NotificationServicePort;
+import com.example.notification_service.application.ports.output.NotificationPersistencePort;
 import com.example.notification_service.domain.model.Notification;
-import com.example.notification_service.infrastructure.output.persistence.mapper.NotificationPersistenceMapper;
-import com.example.notification_service.infrastructure.output.persistence.repository.NotificationRepository;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class NotificationService implements NotificationServicePort {
 
-    private final NotificationRepository notificationRepository;
-    private final NotificationPersistenceMapper mapper;
+    @Value("${twilio.account.sid}")
+    private String accountSid;
 
-    // Guardar una notificación en MongoDB
-    public Notification saveNotification(Notification notification) {
-        return mapper.toNotification(notificationRepository.save(mapper.toNotificationEntity(notification)));
+    @Value("${twilio.auth.token}")
+    private String authToken;
+
+    @Value("${twilio.phone.number}")
+    private String twilioPhoneNumber;
+
+    private final NotificationPersistencePort notificationPersistencePort;
+
+    @Override
+    public Notification save(Notification notification) {
+        Notification savedNotification = notificationPersistencePort.save(notification);
+
+        boolean sent = notificationPersistencePort.sendMessage(savedNotification.getPhoneNumber(),
+                savedNotification.getMessage());
+
+        if (sent) {
+            savedNotification.setSent(true);
+            savedNotification.setSentAt(java.time.LocalDateTime.now());
+            notificationPersistencePort.save(savedNotification);
+        }
+
+        return savedNotification;
+
     }
 
-    // Obtener notificaciones pendientes de envío
-    public List<Notification> getPendingNotifications() {
-        return notificationRepository.findBySentFalse().stream()
-                .map(mapper::toNotification)
-                .collect(Collectors.toList());
+    @Override
+    public List<Notification> findUnsentNotifications() {
+        return notificationPersistencePort.findUnsentNotifications();
     }
 
-    // Marcar una notificación como enviada
-    public void markAsSent(Notification notification) {
-        notification.setSent(true);
-        notificationRepository.save(mapper.toNotificationEntity(notification));
+    @Override
+    public boolean sendMessage(Notification notification) {
+        try {
+            Message message = Message.creator(
+                    new PhoneNumber(notification.getPhoneNumber()),
+                    new PhoneNumber(twilioPhoneNumber),
+                    notification.getMessage()).create();
+
+            return message.getStatus() != Message.Status.FAILED;
+        } catch (Exception e) {
+            return false;
+        }
     }
+
 }

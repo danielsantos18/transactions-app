@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - 5431:5432  # Mapea el puerto correcto (internamente siempre es 5432)
+      - 5431:5432
     expose:
       - 5432
 
@@ -23,27 +23,24 @@ services:
     environment:
       POSTGRES_DB: transactions
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres  # Agregué la contraseña
+      POSTGRES_PASSWORD: postgres
     ports:
-      - 5432:5432
+      - 5440:5432
     expose:
       - 5432
 
-  # MONGODB DATABASE FOR NOTIFICATIONS
-  mongo-notifications:
-    container_name: db-notifications
-    image: mongo:6.0
+   # REDIS DATABASE FOR NOTIFICATIONS
+  redis-notifications:
+    container_name: redis-notifications
+    image: redis:7.0
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: notifications
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root  # Agregué la contraseña
     ports:
-      - 27018:27017
+      - "6379:6379"
     expose:
-      - 27017
+      - 6379
     volumes:
-      - db-notifications-data:/data/db
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
 
   # MONGODB DATABASE FOR LOGS
   mongo-logs:
@@ -53,7 +50,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: logs
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root  # Agregué la contraseña
+      MONGO_INITDB_ROOT_PASSWORD: root
     ports:
       - 27019:27017
     expose:
@@ -78,3 +75,4 @@ services:
 volumes:
   db-notifications-data:
   db-logs-data:
+  redis-data:

@@ -11,11 +11,12 @@ import com.example.notification_service.application.ports.input.NotificationServ
 import com.example.notification_service.domain.model.Notification;
 import com.example.notification_service.infrastructure.input.rest.mapper.NotificationRestMapper;
 import com.example.notification_service.infrastructure.input.rest.model.request.NotificationRequest;
+import com.example.notification_service.infrastructure.input.rest.model.response.NotificationResponse;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/notification")
+@RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class NotificationRestAdapter {
 
@@ -29,7 +30,13 @@ public class NotificationRestAdapter {
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<List<Notification>> getPendingNotifications() {
-        return ResponseEntity.ok(notificationServicePort.getNotifications());
+    public List<NotificationResponse> getPendingNotifications() {
+        return mapper.toNotificationResponseList(notificationServicePort.findUnsentNotifications());
     }
+
+    @GetMapping()
+    public List<NotificationResponse> getAllNotifications() {
+        return mapper.toNotificationResponseList(notificationServicePort.getNotifications());
+    }
+
 }

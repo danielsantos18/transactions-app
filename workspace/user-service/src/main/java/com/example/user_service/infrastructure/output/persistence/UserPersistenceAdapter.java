@@ -18,8 +18,6 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
     private final UserPersistenceMapper userPersistenceMapper;
 
-    // private final AuthService authService;
-
     @Override
     public List<User> findAll() {
         return userPersistenceMapper.toUsers(userRepository.findAll());

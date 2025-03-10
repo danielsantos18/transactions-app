@@ -44,8 +44,6 @@ public class UserService implements UserServicePort {
         if (user.getRole() == null) {
             user.setRole(Role.USER);
         }
-
-        // Enviar mensaje de bienvenida
         String message = "¡Bienvenido, " + user.getUsername() + "! Gracias por registrarte.";
 
         // Crear un objeto para el cuerpo de la solicitud
@@ -53,11 +51,9 @@ public class UserService implements UserServicePort {
         requestBody.put("phoneNumber", user.getPhone());
         requestBody.put("message", message);
 
-        // Configurar los headers para indicar que el contenido es JSON
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Crear la entidad HTTP con el cuerpo y los headers
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
 
         // Llamar al microservicio de notificaciones
@@ -83,6 +79,13 @@ public class UserService implements UserServicePort {
     }
 
     @Override
+    public User findByUsername(String username) {
+        return userPersistencePort.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    }
+
+    @Override
     public List<User> findAll() {
         return userPersistencePort.findAll();
     }
@@ -91,19 +94,16 @@ public class UserService implements UserServicePort {
     public User update(Long id, User user) {
         return userPersistencePort.findById(id).map(savedUser -> {
 
-            // Validar si el correo ya está en uso por otro usuario
             Optional<User> existingByEmail = userPersistencePort.findByEmail(user.getEmail());
             if (existingByEmail.isPresent() && !existingByEmail.get().getId().equals(id)) {
                 throw new IllegalArgumentException("El correo ya está en uso por otro usuario");
             }
 
-            // Validar si el teléfono ya está en uso por otro usuario
             Optional<User> existingByPhone = userPersistencePort.findByPhone(user.getPhone());
             if (existingByPhone.isPresent() && !existingByPhone.get().getId().equals(id)) {
                 throw new IllegalArgumentException("El teléfono ya está en uso por otro usuario");
             }
 
-            // Actualizar datos del usuario
             savedUser.setUsername(user.getUsername());
             savedUser.setPassword(user.getPassword());
             savedUser.setPhone(user.getPhone());
@@ -116,4 +116,5 @@ public class UserService implements UserServicePort {
     public void delete(Long id) {
         userPersistencePort.delete(id);
     }
+
 }

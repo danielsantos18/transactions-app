@@ -17,9 +17,12 @@ public class NotificationServiceApplication {
 
 	@PostConstruct
 	public void initTwilio() {
+		// System.out.println("Inicializando Twilio con SID: " +
+		// twilioConfig.getAccountSid());
 		Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAuthToken());
+		// System.out.println("Twilio inicializado correctamente.");
 	}
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(NotificationServiceApplication.class, args);
 	}

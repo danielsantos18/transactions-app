@@ -5,10 +5,12 @@ import org.springframework.stereotype.Component;
 import com.example.notification_service.application.ports.output.NotificationPersistencePort;
 import com.example.notification_service.domain.model.Notification;
 import com.example.notification_service.infrastructure.config.TwilioConfig;
+import com.example.notification_service.infrastructure.output.persistence.entity.NotificationEntity;
+import com.example.notification_service.infrastructure.output.persistence.mapper.NotificationPersistenceMapper;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,10 +21,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationPersistenceAdapter implements NotificationPersistencePort {
 
     private final TwilioConfig twilioConfig;
+    private final NotificationPersistenceMapper notificationPersistenceMapper;
     private final RedisTemplate<String, Notification> redisTemplate;
 
     @Override
@@ -37,26 +41,47 @@ public class NotificationPersistenceAdapter implements NotificationPersistencePo
 
         if (notification.getSentAt() == null) {
             notification.setSentAt(LocalDateTime.now());
-            sendMessage(notification.getPhoneNumber(), notification.getMessage());
+
+            try {
+                sendMessage(notification.getPhoneNumber(), notification.getMessage());
+                notification.setSent(true);
+            } catch (Exception e) {
+                log.error("Error al enviar el mensaje a {}: {}", notification.getPhoneNumber(), e.getMessage());
+                notification.setSent(false); // No cambiar el estado si hubo un fallo
+            }
         }
 
         redisTemplate.opsForValue().set(notification.getId(), notification);
-
         return notification;
     }
 
     @Override
     public List<Notification> getAllNotifications() {
-        List<Notification> notifications = new ArrayList<>();
-        Set<String> keys = redisTemplate.keys("*"); // Obtiene todas las claves
-        if (keys != null) {
-            for (String key : keys) {
-                Notification notification = redisTemplate.opsForValue().get(key);
-                if (notification != null) {
-                    notifications.add(notification);
-                }
+        Set<String> keys = redisTemplate.keys("*");
+
+        if (keys == null || keys.isEmpty()) {
+            log.warn("No hay claves en Redis con el patrón '*'");
+            return List.of();
+        }
+
+        List<NotificationEntity> notificationEntities = new ArrayList<>();
+
+        for (String key : keys) {
+            Notification notificationEntity = redisTemplate.opsForValue().get(key);
+            if (notificationEntity != null) {
+                NotificationEntity entity = notificationPersistenceMapper.toNotificationEntity(notificationEntity);
+                notificationEntities.add(entity);
+                log.info("Notificación recuperada desde Redis: {}", entity);
+            } else {
+                log.warn("No se encontró ningún valor en Redis para la clave: {}", key);
             }
         }
+
+        List<NotificationEntity> dbNotifications = new ArrayList<>();
+        notificationEntities.addAll(dbNotifications);
+
+        List<Notification> notifications = notificationPersistenceMapper.toNotifications(notificationEntities);
+
         return notifications;
     }
 
@@ -68,7 +93,6 @@ public class NotificationPersistenceAdapter implements NotificationPersistencePo
     @Override
     public List<Notification> findUnsentNotifications() {
         Set<String> keys = redisTemplate.keys("*");
-
         return keys.stream()
                 .map(key -> redisTemplate.opsForValue().get(key))
                 .filter(notification -> notification != null && !notification.isSent())
@@ -76,15 +100,15 @@ public class NotificationPersistenceAdapter implements NotificationPersistencePo
     }
 
     @Override
-    public boolean sendMessage(String phoneNumber, String info) {
+    public boolean sendMessage(String phoneNumber, String messageBody) {
         try {
-            Message message = Message.creator(
+            Message.creator(
                     new PhoneNumber(phoneNumber),
                     new PhoneNumber(twilioConfig.getTrialNumber()),
-                    info).create();
-
-            return message.getStatus() != Message.Status.FAILED;
+                    messageBody).create();
+            return true;
         } catch (Exception e) {
+            System.err.println("Error al enviar el mensaje: " + e.getMessage());
             return false;
         }
     }

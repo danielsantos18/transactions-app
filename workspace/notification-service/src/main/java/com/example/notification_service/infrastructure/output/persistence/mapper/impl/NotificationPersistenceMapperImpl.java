@@ -4,9 +4,8 @@ import com.example.notification_service.domain.model.Notification;
 import com.example.notification_service.infrastructure.output.persistence.entity.NotificationEntity;
 import com.example.notification_service.infrastructure.output.persistence.mapper.NotificationPersistenceMapper;
 import org.springframework.stereotype.Component;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class NotificationPersistenceMapperImpl implements NotificationPersistenceMapper {
@@ -46,11 +45,14 @@ public class NotificationPersistenceMapperImpl implements NotificationPersistenc
     @Override
     public List<Notification> toNotifications(List<NotificationEntity> entityList) {
         if (entityList == null || entityList.isEmpty()) {
-            return List.of();
+            return null;
         }
 
-        return entityList.stream()
-                .map(this::toNotification)
-                .collect(Collectors.toList());
+        List<Notification> list = new ArrayList<>(entityList.size());
+        for (NotificationEntity notificationEntity : entityList) {
+            list.add(toNotification(notificationEntity));
+        }
+
+        return list;
     }
 }

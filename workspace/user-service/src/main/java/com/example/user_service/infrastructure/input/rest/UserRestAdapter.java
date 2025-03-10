@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserRestAdapter {
 
@@ -26,6 +26,11 @@ public class UserRestAdapter {
     @GetMapping("/find/{id}")
     public UserResponse findById(@PathVariable Long id) {
         return userRestMapper.toUserResponse(userServicePort.findById(id));
+    }
+
+    @GetMapping("/find/{username}")
+    public UserResponse findByUsername(@PathVariable String username) {
+        return userRestMapper.toUserResponse(userServicePort.findByUsername(username));
     }
 
     @PutMapping("/update/{id}")

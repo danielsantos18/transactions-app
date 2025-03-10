@@ -14,4 +14,5 @@ public class LogEntity {
     private String level;
     private String message;
     private LocalDateTime timestamp;
+    
 }

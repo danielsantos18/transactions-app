@@ -5,10 +5,11 @@ import com.example.logs_service.infrastructure.output.persistence.entity.LogEnti
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface LogPersistenceMapper {
     LogPersistenceMapper INSTANCE = Mappers.getMapper(LogPersistenceMapper.class);
 
     LogEntity toEntity(Log log);
     Log toDomain(LogEntity entity);
 }
+

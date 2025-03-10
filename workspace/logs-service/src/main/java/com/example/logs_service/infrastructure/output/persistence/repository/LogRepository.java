@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface LogRepository extends MongoRepository<LogEntity, String> {
-    List<LogEntity> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
-    List<LogEntity> findByServicio(String servicio);
-    List<LogEntity> findByNivel(String nivel);
+    List<LogEntity> findByTimestampBetween(LocalDateTime inicio, LocalDateTime fin);
+    List<LogEntity> findByService(String service);
+    List<LogEntity> findByLevel(String level);
 }

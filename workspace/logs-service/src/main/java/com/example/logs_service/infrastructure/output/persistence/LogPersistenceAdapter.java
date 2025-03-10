@@ -1,6 +1,5 @@
 package com.example.logs_service.infrastructure.output.persistence;
 
-
 import com.example.logs_service.application.ports.ouput.LogPersistencePort;
 import com.example.logs_service.domain.model.Log;
 import com.example.logs_service.infrastructure.output.persistence.entity.LogEntity;
@@ -46,23 +45,23 @@ public class LogPersistenceAdapter implements LogPersistencePort {
 
     @Override
     public List<Log> getLogsByDateRange(LocalDateTime inicio, LocalDateTime fin) {
-        return logRepository.findByFechaBetween(inicio, fin)
+        return logRepository.findByTimestampBetween(inicio, fin) // 🔹 Cambio aquí
                 .stream()
                 .map(logPersistenceMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Log> getLogsByService(String servicio) {
-        return logRepository.findByServicio(servicio)
+    public List<Log> getLogsByService(String service) { // 🔹 Cambio aquí
+        return logRepository.findByService(service) // 🔹 Cambio aquí
                 .stream()
                 .map(logPersistenceMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Log> getLogsByLevel(String nivel) {
-        return logRepository.findByNivel(nivel)
+    public List<Log> getLogsByLevel(String level) { // 🔹 Cambio aquí
+        return logRepository.findByLevel(level) // 🔹 Cambio aquí
                 .stream()
                 .map(logPersistenceMapper::toDomain)
                 .collect(Collectors.toList());
